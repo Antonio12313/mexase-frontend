@@ -30,5 +30,5 @@ export async function login(email: string, senha: string) {
 export async function logout() {
     const cookieStore = await cookies()
     cookieStore.delete('@mexase/token')
-    redirect('/')
+    redirect('/login')
 }

@@ -1,39 +1,33 @@
 'use client'
-import { Paper, Title, Stack, Text } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import { login } from "@/app/actions/auth"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { User, Unlock } from "lucide-react"
-import { FormInput } from './ui/FormInput'
-import { FormPasswordInput } from './ui/FormPasswordInput'
-import { PrimaryButton } from './ui/PrimaryButton'
 
-type LoginFormProps = React.ComponentProps<"div">
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import React, {useState} from "react"
+import {useRouter} from "next/navigation"
+import {login} from "@/app/actions/auth"
+import {useForm} from "react-hook-form"
+import {FormField} from "./form-field"
 
-export function LoginForm({ className, ...props }: LoginFormProps) {
-    const [error, setError] = useState<string>("")
+type LoginFormData = {
+    email: string
+    senha: string
+}
+
+export function LoginForm({
+                              className,
+                              ...props
+                          }: React.ComponentPropsWithoutRef<"form">) {
+    const [error, setError] = useState("")
     const router = useRouter()
 
-    const form = useForm({
-        initialValues: {
-            email: '',
-            senha: ''
-        },
-        validate: {
-            email: (value) => {
-                if (!value) return 'Email é obrigatório'
-                if (!/^\S+@\S+$/.test(value)) return 'Email inválido'
-                return null
-            },
-            senha: (value) => !value ? 'Senha é obrigatória' : null
-        }
+    const form = useForm<LoginFormData>({
+        defaultValues: {email: '', senha: ''}
     })
 
-    async function handleSubmit(values: typeof form.values) {
+    const onSubmit = async (data: LoginFormData) => {
         setError("")
-        const result = await login(values.email, values.senha)
+        const result = await login(data.email, data.senha)
 
         if (result.error) {
             setError(result.error)
@@ -44,109 +38,56 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     }
 
     return (
-        <div className={className} {...props}>
-            <div className="md:hidden min-h-screen relative">
-                <div className="absolute inset-0 w-full h-full">
-                    <Image
-                        fill
-                        src="/images/login-mobile.svg"
-                        alt="Background"
-                        className="object-cover"
-                    />
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 bg-[#E8F0EF] rounded-t-[30px] pt-12 pb-8 px-6">
-                    <form onSubmit={form.onSubmit(handleSubmit)}>
-                        <Stack gap="md" className="max-w-[380px] mx-auto">
-                            <Title order={1} size="h2" className="text-black text-center mb-4">
-                                Login
-                            </Title>
-
-                            <FormInput
-                                id="email"
-                                type="email"
-                                placeholder="Usuario:"
-                                icon={<User size={20} color="#777B73" />}
-                                {...form.getInputProps('email')}
-                            />
-
-                            <FormPasswordInput
-                                id="password"
-                                placeholder="Senha:"
-                                icon={<Unlock size={20} color="#777B73" />}
-                                {...form.getInputProps('senha')}
-                            />
-
-                            <PrimaryButton>
-                                Login
-                            </PrimaryButton>
-
-                            {error && (
-                                <Text size="sm" c="red" ta="center">
-                                    {error}
-                                </Text>
-                            )}
-                        </Stack>
-                    </form>
-                </div>
+        <form
+            className={cn("flex flex-col gap-6", className)}
+            onSubmit={form.handleSubmit(onSubmit)}
+            {...props}
+        >
+            <div className="flex flex-col items-center gap-2 text-center">
+                <h1 className="text-2xl font-bold">Fazer Login</h1>
+                <p className="text-balance text-sm text-muted-foreground">
+                    Coloque seu email abaixo para logar na sua conta
+                </p>
             </div>
 
-            <div className="hidden md:block">
-                <Paper
-                    shadow="xl"
-                    radius="lg"
-                    className="max-w-[920px] mx-auto overflow-hidden p-0"
+            {error && (
+                <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                    {error}
+                </div>
+            )}
+
+            <div className="grid gap-6">
+                <FormField
+                    control={form.control}
+                    name="email"
+                    label="Email"
                 >
-                    <div className="grid md:grid-cols-[468px_452px]">
-                        <div className="p-8 md:p-12 flex flex-col justify-center">
-                            <form onSubmit={form.onSubmit(handleSubmit)}>
-                                <Stack gap="md">
-                                    <div className="flex flex-col items-center gap-4">
-                                        <Title order={1} size="h2" className="text-black">
-                                            Login
-                                        </Title>
-                                    </div>
+                    <Input
+                        type="email"
+                        placeholder="email@example.com"
+                        required
+                    />
+                </FormField>
 
-                                    <FormInput
-                                        id="email"
-                                        type="email"
-                                        placeholder="Usuario:"
-                                        icon={<User size={20} color="#777B73" />}
-                                        {...form.getInputProps('email')}
-                                    />
+                <FormField
+                    control={form.control}
+                    name="senha"
+                    label="Senha"
+                >
+                    <Input
+                        type="password"
+                        required
+                    />
+                </FormField>
 
-                                    <FormPasswordInput
-                                        id="password"
-                                        placeholder="Senha:"
-                                        icon={<Unlock size={20} color="#777B73" />}
-                                        {...form.getInputProps('senha')}
-                                    />
-
-                                    <PrimaryButton>
-                                        Login
-                                    </PrimaryButton>
-
-                                    {error && (
-                                        <Text size="sm" c="red" ta="center">
-                                            {error}
-                                        </Text>
-                                    )}
-                                </Stack>
-                            </form>
-                        </div>
-
-                        <div className="relative hidden md:block rounded-r-[25px] overflow-hidden">
-                            <Image
-                                width={452}
-                                height={600}
-                                src="/images/login.svg"
-                                alt="Background"
-                                className="object-cover"
-                            />
-                        </div>
-                    </div>
-                </Paper>
+                <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={form.formState.isSubmitting}
+                >
+                    {form.formState.isSubmitting ? "Carregando..." : "Login"}
+                </Button>
             </div>
-        </div>
+        </form>
     )
 }
