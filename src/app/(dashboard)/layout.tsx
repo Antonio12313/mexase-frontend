@@ -1,3 +1,5 @@
+'use client'
+
 import {AppSidebar} from "@/components/app-sidebar"
 import {
     Breadcrumb,
@@ -8,14 +10,13 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import {Separator} from "@/components/ui/separator"
-import {SidebarInset, SidebarProvider, SidebarTrigger,} from "@/components/ui/sidebar"
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
 import React from "react"
+import {BreadcrumbProvider, useBreadcrumbs} from "@/lib/breadcrumbs-context"
 
-export default function DashboardLayout({
-                                            children,
-                                        }: {
-    children: React.ReactNode
-}) {
+function DashboardContent({ children }: { children: React.ReactNode }) {
+    const { breadcrumbs } = useBreadcrumbs()
+
     return (
         <SidebarProvider>
             <AppSidebar/>
@@ -30,15 +31,22 @@ export default function DashboardLayout({
                         />
                         <Breadcrumb>
                             <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Building Your Application
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block"/>
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                                </BreadcrumbItem>
+                                {breadcrumbs.map((crumb, index) => (
+                                    <React.Fragment key={index}>
+                                        {index > 0 && (
+                                            <BreadcrumbSeparator className="hidden md:block"/>
+                                        )}
+                                        <BreadcrumbItem className="hidden md:block">
+                                            {crumb.href ? (
+                                                <BreadcrumbLink href={crumb.href}>
+                                                    {crumb.label}
+                                                </BreadcrumbLink>
+                                            ) : (
+                                                <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                                            )}
+                                        </BreadcrumbItem>
+                                    </React.Fragment>
+                                ))}
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
@@ -48,5 +56,17 @@ export default function DashboardLayout({
                 </div>
             </SidebarInset>
         </SidebarProvider>
+    )
+}
+
+export default function DashboardLayout({
+                                            children,
+                                        }: {
+    children: React.ReactNode
+}) {
+    return (
+        <BreadcrumbProvider>
+            <DashboardContent>{children}</DashboardContent>
+        </BreadcrumbProvider>
     )
 }
