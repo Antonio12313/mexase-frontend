@@ -71,7 +71,6 @@ export default function Page() {
         if (meta.page > 1) fetchData(meta.page - 1)
     }
 
-    if (loading) return <p className="text-center py-10">Carregando pacientes...</p>
 
 
 
@@ -134,88 +133,90 @@ export default function Page() {
                                     <TableHead className="text-right">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody>
-                                {pacientes.map((paciente) => (
-                                    <TableRow key={paciente.id}>
-                                        <TableCell className="font-medium">{paciente.nome}</TableCell>
-                                        <TableCell>{formatarCPF(paciente.cpf)}</TableCell>
-                                        <TableCell>{paciente.email}</TableCell>
-                                        <TableCell>{formatarTelefone(paciente.telefone)}</TableCell>
-                                        <TableCell>{calcularIdade(paciente.data_nascimento)} anos</TableCell>
-                                        <TableCell>
-                                            <Badge variant={paciente.sexo === "F" ? "secondary" : "outline"}>
-                                                {paciente.sexo === "F" ? "Feminino" : "Masculino"}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>{paciente.nome_setor}</TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Abrir menu</span>
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem className="gap-2">
-                                                        <StethoscopeIcon className="h-4 w-4" /> Iniciar Consulta
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="gap-2"><Eye className="h-4 w-4" /> Visualizar Consulta</DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        className="gap-2"
-                                                        onClick={() => editarPaciente(paciente.id)}
-                                                    >
-                                                        <Pencil className="h-4 w-4" /> Editar paciente
-                                                    </DropdownMenuItem>
-
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => setPacienteParaExcluir(paciente.id)}
-                                                        className="gap-2 text-destructive focus:text-destructive"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" /> Excluir paciente
-                                                    </DropdownMenuItem>
-
-                                                </DropdownMenuContent>
-
-                                            </DropdownMenu>
-
-                                            <AlertDialog
-                                                open={pacienteParaExcluir === paciente.id}
-                                                onOpenChange={(open) => !open && setPacienteParaExcluir(null)}
-                                            >
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Tem certeza que deseja excluir?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Essa ação não pode ser desfeita. O paciente será removido permanentemente.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel onClick={() => setPacienteParaExcluir(null)}>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={async () => {
-                                                                try {
-                                                                    await handleExcluirPaciente(paciente.id)
-                                                                    setPacienteParaExcluir(null)
-                                                                    await buscar(1)
-                                                                    toast.success("Paciente removido com sucesso!")
-                                                                } catch (error) {
-                                                                    console.error("Erro ao remover paciente:", error)
-                                                                    toast.error("Não foi possível remover o paciente.")
-                                                                }
-                                                            }}
+                            {!loading && (
+                                <TableBody>
+                                    {pacientes.map((paciente) => (
+                                        <TableRow key={paciente.id}>
+                                            <TableCell className="font-medium">{paciente.nome}</TableCell>
+                                            <TableCell>{formatarCPF(paciente.cpf)}</TableCell>
+                                            <TableCell>{paciente.email}</TableCell>
+                                            <TableCell>{formatarTelefone(paciente.telefone)}</TableCell>
+                                            <TableCell>{calcularIdade(paciente.data_nascimento)} anos</TableCell>
+                                            <TableCell>
+                                                <Badge variant={paciente.sexo === "F" ? "secondary" : "outline"}>
+                                                    {paciente.sexo === "F" ? "Feminino" : "Masculino"}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>{paciente.nome_setor}</TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Abrir menu</span>
+                                                            <MoreVertical className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                                        <DropdownMenuItem className="gap-2">
+                                                            <StethoscopeIcon className="h-4 w-4" /> Iniciar Consulta
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="gap-2"><Eye className="h-4 w-4" /> Visualizar Consulta</DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            className="gap-2"
+                                                            onClick={() => editarPaciente(paciente.id)}
                                                         >
-                                                            Confirmar
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
+                                                            <Pencil className="h-4 w-4" /> Editar paciente
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            onClick={() => setPacienteParaExcluir(paciente.id)}
+                                                            className="gap-2 text-destructive focus:text-destructive"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" /> Excluir paciente
+                                                        </DropdownMenuItem>
+
+                                                    </DropdownMenuContent>
+
+                                                </DropdownMenu>
+
+                                                <AlertDialog
+                                                    open={pacienteParaExcluir === paciente.id}
+                                                    onOpenChange={(open) => !open && setPacienteParaExcluir(null)}
+                                                >
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Tem certeza que deseja excluir?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Essa ação não pode ser desfeita. O paciente será removido permanentemente.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel onClick={() => setPacienteParaExcluir(null)}>Cancelar</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={async () => {
+                                                                    try {
+                                                                        await handleExcluirPaciente(paciente.id)
+                                                                        setPacienteParaExcluir(null)
+                                                                        await buscar(1)
+                                                                        toast.success("Paciente removido com sucesso!")
+                                                                    } catch (error) {
+                                                                        console.error("Erro ao remover paciente:", error)
+                                                                        toast.error("Não foi possível remover o paciente.")
+                                                                    }
+                                                                }}
+                                                            >
+                                                                Confirmar
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            )}
                         </Table>
 
                     </div>
