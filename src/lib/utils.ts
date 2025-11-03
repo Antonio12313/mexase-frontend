@@ -20,6 +20,8 @@ export function formatarCPF(cpf: string): string {
 }
 
 export function formatarTelefone(telefone: string): string {
+    if(!telefone) return "-"
+    
     const numeros = telefone.replace(/\D/g, '')
 
     if (numeros.length === 10) {

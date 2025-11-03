@@ -223,3 +223,14 @@ export async function salvarDadosDieteticos(pacienteId: string, dados: any, isEd
     return { success: false, error: error.response?.data?.message || "Erro ao salvar estilo de vida" }
   }
 }
+
+export async function buscarTotalDePacientesPorSexo(id: string) {
+  const cookieStore = cookies()
+  const token = (await cookieStore).get('@mexase/token')?.value
+  return callApi(async () => {
+    const response = await api.get(`/pacientes/por-genero`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return { success: true, data: response.data }
+  })
+}

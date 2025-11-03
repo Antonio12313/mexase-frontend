@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Command, Users } from "lucide-react"
+import { useTheme } from "next-themes"
+import { Command, Users, Apple } from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -16,15 +17,16 @@ import {
 } from "@/components/ui/sidebar"
 import { obterDadosNutri } from "@/app/actions/nutricionista"
 
+let cachedUser: any = null
 
-let cachedUser: { name: string; email: string; avatar: string } | null = null
+export function clearCachedUser() {
+  cachedUser = null
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState<{ name: string; email: string; avatar: string }>(
-    cachedUser || { name: "Carregando...", email: "", avatar: "" }
-  )
-
+  const [user, setUser] = React.useState(cachedUser)
   const [loading, setLoading] = React.useState(!cachedUser)
+  const { setTheme } = useTheme()
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -37,36 +39,46 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           const userData = {
             name: res.data.nome,
             email: res.data.email,
+            isAdmin: res.data.isAdmin,
+            isDarkTema: res.data.isTemaDark,
             avatar: "",
           }
 
           cachedUser = userData
           setUser(userData)
-        } else {
-          setUser({ name: "Usuário", email: "email@exemplo.com", avatar: "" })
+
+          // ✅ Apenas aplica o tema uma vez, sem forçar re-render SSR
+          setTheme(userData.isDarkTema ? "dark" : "light")
         }
       } catch (err) {
         console.error("Erro ao carregar usuário:", err)
-        setUser({ name: "Erro ao carregar", email: "", avatar: "" })
       } finally {
         setLoading(false)
       }
     }
 
     fetchUser()
-  }, [])
+  }, [setTheme])
 
-  const data = {
-  user,
-  navMain: [
+  if (!user && loading) return null
+
+  const navMain = [
     {
       title: "Paciente",
       url: "/paciente",
       icon: Users,
       isActive: true,
     },
-  ],
-}
+  ]
+
+  if (user?.isAdmin) {
+    navMain.push({
+      title: "Nutricionista",
+      url: "/nutricionista",
+      icon: Apple,
+      isActive: true,
+    })
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -89,11 +101,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
 
       <SidebarRail />
