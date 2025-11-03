@@ -1,12 +1,11 @@
 'use client'
 import { useState, useEffect } from "react"
-import { listarPacientes, handleExcluirPaciente } from "@/app/actions/paciente"
+import { listarNutricionistas, handleExcluirNutricionista } from "@/app/actions/nutricionista"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { calcularIdade, formatarCPF, formatarTelefone } from "@/lib/utils"
+import { formatarTelefone } from "@/lib/utils"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,8 +14,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
-import { Eye, MoreVertical, Pencil, Plus, Search, StethoscopeIcon, Trash2 } from "lucide-react"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
+import { MoreVertical, Pencil, Plus, Search, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { SetBreadcrumbs } from "@/lib/breadcrumbs-context"
 import { toast } from "sonner"
@@ -24,41 +23,41 @@ import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function Page() {
-    const [pacientes, setPacientes] = useState<any[]>([])
+    const [nutricionistas, setNutricionistas] = useState<any[]>([])
     const [meta, setMeta] = useState({ totalPages: 1, page: 1, limit: 10, totalItems: 0 })
     const [loading, setLoading] = useState(true)
 
     const [filtroTipo, setFiltroTipo] = useState("nome")
     const [filtroValor, setFiltroValor] = useState("")
+    const [filtroStatus, setFiltroStatus] = useState("todos")
 
-    const [pacienteParaExcluir, setPacienteParaExcluir] = useState<number | null>(null)
+    const [nutricionistaParaExcluir, setNutricionistaParaExcluir] = useState<number | null>(null)
 
     const buscar = async (page = 1) => {
         setLoading(true)
         try {
-            const result = await listarPacientes(page, meta.limit, filtroTipo, filtroValor)
-            setPacientes(result.data)
+            const result = await listarNutricionistas(page, meta.limit, filtroTipo, filtroValor)
+            setNutricionistas(result.data)
             setMeta(result.meta)
         } catch (error) {
-            console.error("Erro ao buscar pacientes:", error)
+            console.error("Erro ao buscar nutricionistas:", error)
         } finally {
             setLoading(false)
         }
     }
     const fetchData = async (page = 1) => {
         setLoading(true)
-        const result = await listarPacientes(page, meta.limit)
-        setPacientes(result.data)
+        const result = await listarNutricionistas(page, meta.limit)
+        setNutricionistas(result.data)
         setMeta(result.meta)
         setLoading(false)
     }
 
     const router = useRouter()
 
-    const editarPaciente = async (id: string) => {
-        router.push(`/paciente/${id}/update`)
+    const editarNutricionista = async (id: string) => {
+        router.push(`/nutricionista/${id}/update`)
     }
-
 
     useEffect(() => {
         fetchData()
@@ -72,22 +71,20 @@ export default function Page() {
         if (meta.page > 1) fetchData(meta.page - 1)
     }
 
-    if (loading) return <p className="text-center py-10">Carregando pacientes...</p>
-
-
+    if (loading) return <p className="text-center py-10">Carregando nutricionistas...</p>
 
     return (
         <div className="w-full h-full space-y-4">
-            <SetBreadcrumbs items={[{ label: "Home", href: "/home" }, { label: "Paciente" }]} />
+            <SetBreadcrumbs items={[{ label: "Home", href: "/home" }, { label: "Nutricionista" }]} />
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle className="text-2xl">Pacientes</CardTitle>
-                            <CardDescription>Gerencie os pacientes cadastrados no sistema</CardDescription>
+                            <CardTitle className="text-2xl">Nutricionistas</CardTitle>
+                            <CardDescription>Gerencie os nutricionistas cadastrados no sistema</CardDescription>
                         </div>
                         <Button className="gap-3" asChild>
-                            <Link href="/paciente/create">
+                            <Link href="/nutricionista/create">
                                 <Plus className="h-4 w-4" /> Novo
                             </Link>
                         </Button>
@@ -95,14 +92,14 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                     <div className="mb-4 flex gap-2 items-center">
-                        
+
                         <Select value={filtroTipo} onValueChange={setFiltroTipo}>
                             <SelectTrigger className="w-32">
                                 <SelectValue placeholder="Tipo" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="nome">Nome</SelectItem>
-                                <SelectItem value="matricula">CPF</SelectItem>
+                                <SelectItem value="matricula">Matricula</SelectItem>
                                 <SelectItem value="email">Email</SelectItem>
                             </SelectContent>
                         </Select>
@@ -127,30 +124,20 @@ export default function Page() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>Matricula</TableHead>
                                     <TableHead>Nome</TableHead>
-                                    <TableHead>CPF</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Telefone</TableHead>
-                                    <TableHead>Idade</TableHead>
-                                    <TableHead>Sexo</TableHead>
-                                    <TableHead>Setor</TableHead>
                                     <TableHead className="text-right">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {pacientes.map((paciente) => (
-                                    <TableRow key={paciente.id}>
-                                        <TableCell className="font-medium">{paciente.nome}</TableCell>
-                                        <TableCell>{formatarCPF(paciente.cpf)}</TableCell>
-                                        <TableCell>{paciente.email}</TableCell>
-                                        <TableCell>{formatarTelefone(paciente.telefone)}</TableCell>
-                                        <TableCell>{calcularIdade(paciente.data_nascimento)} anos</TableCell>
-                                        <TableCell>
-                                            <Badge variant={paciente.sexo === "F" ? "secondary" : "outline"}>
-                                                {paciente.sexo === "F" ? "Feminino" : "Masculino"}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>{paciente.nome_setor}</TableCell>
+                                {nutricionistas.map((nutricionista) => (
+                                    <TableRow key={nutricionista.id}>
+                                        <TableCell>{nutricionista.matricula}</TableCell>
+                                        <TableCell className="font-medium">{nutricionista.nome}</TableCell>
+                                        <TableCell>{nutricionista.email}</TableCell>
+                                        <TableCell>{formatarTelefone(nutricionista.telefone)}</TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
@@ -161,52 +148,48 @@ export default function Page() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem className="gap-2">
-                                                        <StethoscopeIcon className="h-4 w-4" /> Iniciar Consulta
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="gap-2"><Eye className="h-4 w-4" /> Visualizar Consulta</DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         className="gap-2"
-                                                        onClick={() => editarPaciente(paciente.id)}
+                                                        onClick={() => editarNutricionista(nutricionista.id)}
                                                     >
-                                                        <Pencil className="h-4 w-4" /> Editar paciente
+                                                        <Pencil className="h-4 w-4" /> Editar nutricionista
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuSeparator />
+
                                                     <DropdownMenuItem
-                                                        onClick={() => setPacienteParaExcluir(paciente.id)}
+                                                        onClick={() => setNutricionistaParaExcluir(nutricionista.id)}
                                                         className="gap-2 text-destructive focus:text-destructive"
                                                     >
-                                                        <Trash2 className="h-4 w-4" /> Excluir paciente
+                                                        <Trash2 className="h-4 w-4" /> Excluir nutricionista
                                                     </DropdownMenuItem>
 
                                                 </DropdownMenuContent>
 
                                             </DropdownMenu>
-
-                                            <AlertDialog
-                                                open={pacienteParaExcluir === paciente.id}
-                                                onOpenChange={(open) => !open && setPacienteParaExcluir(null)}
+                                             <AlertDialog
+                                                open={nutricionistaParaExcluir === nutricionista.id}
+                                                onOpenChange={(open) => !open && setNutricionistaParaExcluir(null)}
                                             >
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Tem certeza que deseja excluir?</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Essa ação não pode ser desfeita. O paciente será removido permanentemente.
+                                                            Essa ação não pode ser desfeita. O nutricionista será removido permanentemente.
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
-                                                        <AlertDialogCancel onClick={() => setPacienteParaExcluir(null)}>Cancelar</AlertDialogCancel>
+                                                        <AlertDialogCancel onClick={() => setNutricionistaParaExcluir(null)}>Cancelar</AlertDialogCancel>
                                                         <AlertDialogAction
                                                             onClick={async () => {
                                                                 try {
-                                                                    await handleExcluirPaciente(paciente.id)
-                                                                    setPacienteParaExcluir(null)
+                                                                    await handleExcluirNutricionista(nutricionista.id)
+                                                                    setNutricionistaParaExcluir(null)
                                                                     await buscar(1)
-                                                                    toast.success("Paciente removido com sucesso!")
+                                                                    toast.success("Nutricionista removido com sucesso!")
                                                                 } catch (error) {
-                                                                    console.error("Erro ao remover paciente:", error)
-                                                                    toast.error("Não foi possível remover o paciente.")
+                                                                    console.error("Erro ao remover nutricionista:", error)
+                                                                    toast.error("Não foi possível remover o nutricionista.")
                                                                 }
                                                             }}
                                                         >
@@ -224,7 +207,7 @@ export default function Page() {
                     </div>
                     <div className="flex items-center justify-between mt-4">
                         <p className="text-sm text-muted-foreground">
-                            Mostrando <strong>{pacientes.length}</strong> de <strong>{meta.totalItems}</strong> pacientes
+                            Mostrando <strong>{nutricionistas.length}</strong> de <strong>{meta.totalItems}</strong> nutricionistas
                             {" "} - Página <strong>{meta.page}</strong> de <strong>{meta.totalPages}</strong>
                         </p>
                         <div className="flex gap-2">
