@@ -1,8 +1,20 @@
+"use client"
 import {GalleryVerticalEnd} from "lucide-react"
 import {LoginForm} from "@/components/login-form"
 import Image from "next/image"
+import { useEffect } from "react"
+import { useSearchParams } from "next/navigation"
+import { toast, Toaster } from "sonner"
 
 export default function LoginPage() {
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        const session = searchParams.get("session")
+        if (session === "expired") {
+            toast.error("Sessão expirada, faça o login novamente.")
+        }
+    }, [searchParams])
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -18,6 +30,7 @@ export default function LoginPage() {
                 </div>
                 <div className="flex flex-1 items-center justify-center">
                     <div className="w-full max-w-xs">
+                        <Toaster className="fixed left-75"/>
                         <LoginForm/>
                     </div>
                 </div>

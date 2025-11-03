@@ -23,7 +23,7 @@ export async function login(email: string, senha: string) {
         return {success: true}
     } catch (error) {
         console.error('Erro no login:', error)
-        return {error: 'Erro ao fazer login'}
+        return {error: 'Usuário ou senha inválidos'}
     }
 }
 

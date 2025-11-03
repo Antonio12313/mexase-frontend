@@ -1,47 +1,52 @@
 'use client'
 
-import {Button} from "@/components/ui/button"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card"
-import {Input} from "@/components/ui/input"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
-import {ArrowLeft, Save} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form"
+import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
-import {useForm} from "react-hook-form"
-import {zodResolver} from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import {SetBreadcrumbs} from "@/lib/breadcrumbs-context";
+import { SetBreadcrumbs } from "@/lib/breadcrumbs-context";
+import { useState, useEffect } from "react"
+import { listarSetores } from "@/app/actions/setores"
+import { salvarPaciente } from "@/app/actions/paciente"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const pacienteSchema = z.object({
     nome: z.string()
-        .min(2, {error: "O nome deve ter no mínimo 2 caracteres"})
-        .max(150, {error: "O nome deve ter no máximo 150 caracteres"}),
+        .min(2, { error: "O nome deve ter no mínimo 2 caracteres" })
+        .max(150, { error: "O nome deve ter no máximo 150 caracteres" }),
 
-    email: z.email({error: "Email inválido"}),
+    email: z.email({ error: "Email inválido" }),
 
     cpf: z.string()
-        .length(11, {error: "O CPF deve ter 11 dígitos"})
-        .regex(/^\d+$/, {error: "O CPF deve conter apenas números"}),
+        .length(11, { error: "O CPF deve ter 11 dígitos" })
+        .regex(/^\d+$/, { error: "O CPF deve conter apenas números" }),
 
     data_nascimento: z.string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, {error: "A data inserida é inválida"}),
+        .regex(/^\d{4}-\d{2}-\d{2}$/, { error: "A data inserida é inválida" }),
 
     telefone: z.string()
-        .min(8, {error: "O telefone deve ter no mínimo 8 dígitos"})
-        .max(11, {error: "O telefone deve ter no máximo 11 dígitos"})
+        .min(8, { error: "O telefone deve ter no mínimo 8 dígitos" })
+        .max(11, { error: "O telefone deve ter no máximo 11 dígitos" })
         .optional()
         .or(z.literal("")),
 
-    sexo: z.enum(["M", "F"], {error: "Selecione M ou F"}).optional(),
+    sexo: z.enum(["M", "F"], { error: "Selecione M ou F" }).optional(),
 
     naturalidade: z.string()
-        .min(2, {error: "A naturalidade deve ter no mínimo 2 caracteres"})
-        .max(60, {error: "A naturalidade deve ter no máximo 60 caracteres"})
+        .min(2, { error: "A naturalidade deve ter no mínimo 2 caracteres" })
+        .max(60, { error: "A naturalidade deve ter no máximo 60 caracteres" })
         .optional()
         .or(z.literal("")),
 
     cd_setor: z.string()
-        .min(1, {error: "O setor é obrigatório"})
+        .min(1, { error: "O setor é obrigatório" })
 })
 
 type PacienteFormValues = z.infer<typeof pacienteSchema>
@@ -61,17 +66,51 @@ export default function Page() {
         },
     })
 
-    const onSubmit = (data: PacienteFormValues) => {
-        console.log('Dados validados:', data)
+    const [setores, setSetores] = useState<any[]>([])
+
+    const fetchData = async () => {
+        try {
+            const result = await listarSetores();
+            setSetores(result ?? []);
+        } catch (error) {
+            console.error("Erro ao listar setores:", error);
+            setSetores([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    const router = useRouter()
+
+    const onSubmit = async (data: PacienteFormValues) => {
+        try {
+            const payload = {
+                ...data,
+                cd_setor: Number(data.cd_setor),
+            };
+            const result = await salvarPaciente(payload)
+
+            if (result.success) {
+                toast.success("Paciente cadastrado com sucesso!")
+                router.push("/paciente")
+            } else {
+                toast.error("Falha ao cadastrar paciente.")
+            }
+        } catch (error) {
+            console.error("Erro ao cadastrar paciente:", error)
+            toast.error("Erro inesperado ao cadastrar paciente.")
+        }
     }
 
     return (
         <div className="w-full h-full">
             <SetBreadcrumbs items={[
-                {label: 'Home', href: '/home'},
-                {label: 'Paciente', href: '/paciente'},
-                {label: 'Cadastro'},
-            ]}/>
+                { label: 'Home', href: '/home' },
+                { label: 'Paciente', href: '/paciente' },
+                { label: 'Cadastro' },
+            ]} />
             <Card>
                 <CardHeader>
                     <div className="flex items-center gap-4 justify-between">
@@ -83,7 +122,7 @@ export default function Page() {
                         </div>
                         <Button variant="ghost" size="icon" asChild>
                             <Link href="/paciente">
-                                <ArrowLeft className="h-4 w-4"/>
+                                <ArrowLeft className="h-4 w-4" />
                             </Link>
                         </Button>
                     </div>
@@ -98,14 +137,14 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="nome"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Nome Completo *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Digite o nome completo" {...field} />
                                                 </FormControl>
                                                 <div className="min-h-[20px]">
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -114,7 +153,7 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="cpf"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>CPF *</FormLabel>
                                                 <FormControl>
@@ -123,7 +162,7 @@ export default function Page() {
                                                 <div className="min-h-[20px]">
                                                     <FormDescription>Apenas números, sem pontos ou
                                                         traços</FormDescription>
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -132,14 +171,14 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="data_nascimento"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Data de Nascimento *</FormLabel>
                                                 <FormControl>
                                                     <Input type="date" {...field} />
                                                 </FormControl>
                                                 <div className="min-h-[20px]">
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -148,13 +187,13 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="sexo"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Sexo</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Selecione o sexo"/>
+                                                            <SelectValue placeholder="Selecione o sexo" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
@@ -163,7 +202,7 @@ export default function Page() {
                                                     </SelectContent>
                                                 </Select>
                                                 <div className="min-h-[20px]">
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -172,14 +211,14 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="naturalidade"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Naturalidade</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Cidade de nascimento" {...field} />
                                                 </FormControl>
                                                 <div className="min-h-[20px]">
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -194,14 +233,14 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="email"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Email *</FormLabel>
                                                 <FormControl>
                                                     <Input type="email" placeholder="exemplo@email.com" {...field} />
                                                 </FormControl>
                                                 <div className="min-h-[20px]">
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -210,7 +249,7 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="telefone"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Telefone</FormLabel>
                                                 <FormControl>
@@ -218,7 +257,7 @@ export default function Page() {
                                                 </FormControl>
                                                 <div className="min-h-[20px]">
                                                     <FormDescription>Apenas números, incluindo DDD</FormDescription>
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -233,28 +272,23 @@ export default function Page() {
                                     <FormField
                                         control={form.control}
                                         name="cd_setor"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Setor *</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Selecione o setor"/>
+                                                            <SelectValue placeholder="Selecione o setor" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="1">Cardiologia</SelectItem>
-                                                        <SelectItem value="2">Ortopedia</SelectItem>
-                                                        <SelectItem value="3">Pediatria</SelectItem>
-                                                        <SelectItem value="4">Neurologia</SelectItem>
-                                                        <SelectItem value="5">Dermatologia</SelectItem>
-                                                        <SelectItem value="6">Oftalmologia</SelectItem>
-                                                        <SelectItem value="7">Ginecologia</SelectItem>
-                                                        <SelectItem value="8">Psiquiatria</SelectItem>
+                                                        {setores.map((setor) => (
+                                                            <SelectItem key={setor.cd_setor} value={String(setor.cd_setor)}>{setor.nome}</SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
                                                 <div className="min-h-[20px]">
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -269,7 +303,7 @@ export default function Page() {
                                     </Link>
                                 </Button>
                                 <Button type="submit" className="gap-2">
-                                    <Save className="h-4 w-4"/>
+                                    <Save className="h-4 w-4" />
                                     Salvar Paciente
                                 </Button>
                             </div>
