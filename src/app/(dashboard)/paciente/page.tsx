@@ -221,7 +221,6 @@ export default function Page() {
                                     ))}
                                 </TableBody>
                             </Table>
-                            
                         )}
 
                     </div>
