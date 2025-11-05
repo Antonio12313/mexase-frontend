@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 
-const totalConsultas = 128
+const totalConsultas = 40
 
 const chartData = [
   {
@@ -37,17 +37,17 @@ const chartConfig = {
 
 export function ChartConsultasMes() {
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col h-96 overflow-hidden">
       <CardHeader className="items-center pb-0">
         <CardTitle>Total de Consultas</CardTitle>
         <CardDescription>
           {new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" })}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="flex-1 flex items-center justify-center p-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="w-full max-w-[240px] h-full max-h-[240px]"
         >
           <RadialBarChart
             data={chartData}
