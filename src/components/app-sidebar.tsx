@@ -17,21 +17,37 @@ import {
 } from "@/components/ui/sidebar"
 import { obterDadosNutri } from "@/app/actions/nutricionista"
 
-let cachedUser: any = null
+let cachedUser: { 
+  name: string
+  email: string
+  avatar: string
+  isAdmin: boolean 
+  isDarkTema: boolean
+} | null = null
 
 export function clearCachedUser() {
   cachedUser = null
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState(cachedUser)
-  const [loading, setLoading] = React.useState(!cachedUser)
   const { setTheme } = useTheme()
+
+  const [user, setUser] = React.useState({
+    name: cachedUser?.name || "Carregando...",
+    email: cachedUser?.email || "",
+    avatar: cachedUser?.avatar || "",
+    isAdmin: cachedUser?.isAdmin || false,
+    isDarkTema: cachedUser?.isDarkTema || false,
+  })
+
+  const [loading, setLoading] = React.useState(!cachedUser)
 
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        if (cachedUser) return
+        if (cachedUser) {
+          return
+        }
 
         const res = await obterDadosNutri()
 
@@ -47,11 +63,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           cachedUser = userData
           setUser(userData)
 
-          // ✅ Apenas aplica o tema uma vez, sem forçar re-render SSR
-          setTheme(userData.isDarkTema ? "dark" : "light")
+          if (!document.documentElement.classList.contains("dark") && userData.isDarkTema)
+          document.documentElement.classList.add("dark")
         }
       } catch (err) {
-        console.error("Erro ao carregar usuário:", err)
+        console.error("Erro ao carregar usuário/tema:", err)
       } finally {
         setLoading(false)
       }
@@ -59,8 +75,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     fetchUser()
   }, [setTheme])
-
-  if (!user && loading) return null
 
   const navMain = [
     {
@@ -71,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
   ]
 
-  if (user?.isAdmin) {
+  if (user.isAdmin) {
     navMain.push({
       title: "Nutricionista",
       url: "/nutricionista",

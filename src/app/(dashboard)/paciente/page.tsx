@@ -74,7 +74,11 @@ export default function Page() {
 
     if (loading) return <p className="text-center py-10">Carregando pacientes...</p>
 
-
+    const renderBadgeSexo = (sexo: string) => {
+        if (sexo === "F") return <Badge variant="default">Feminino</Badge>
+        if (sexo === "M") return <Badge variant="default">Masculino</Badge>
+        return <Badge variant="default">Outro</Badge>
+    }
 
     return (
         <div className="w-full h-full space-y-4">
@@ -146,9 +150,7 @@ export default function Page() {
                                         <TableCell>{formatarTelefone(paciente.telefone)}</TableCell>
                                         <TableCell>{calcularIdade(paciente.data_nascimento)} anos</TableCell>
                                         <TableCell>
-                                            <Badge variant={paciente.sexo === "F" ? "secondary" : "outline"}>
-                                                {paciente.sexo === "F" ? "Feminino" : "Masculino"}
-                                            </Badge>
+                                            {renderBadgeSexo(paciente.sexo)}
                                         </TableCell>
                                         <TableCell>{paciente.nome_setor}</TableCell>
                                         <TableCell className="text-right">

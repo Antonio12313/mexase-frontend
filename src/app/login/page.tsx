@@ -40,7 +40,7 @@ export default function LoginPage() {
 
         <div className="relative hidden lg:block bg-muted">
           <Image
-            src="/images/login-mobile.svg"
+            src="/images/login-mobile.png"
             alt="placeholder"
             fill
             style={{ objectFit: "cover" }}

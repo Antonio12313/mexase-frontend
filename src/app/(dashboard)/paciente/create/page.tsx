@@ -37,7 +37,7 @@ const pacienteSchema = z.object({
         .optional()
         .or(z.literal("")),
 
-    sexo: z.enum(["M", "F"], { error: "Selecione M ou F" }).optional(),
+    sexo: z.enum(["M", "F", "O"], { error: "Selecione M, F ou O" }).optional(),
 
     naturalidade: z.string()
         .min(2, { error: "A naturalidade deve ter no mínimo 2 caracteres" })
@@ -199,6 +199,7 @@ export default function Page() {
                                                     <SelectContent>
                                                         <SelectItem value="M">Masculino</SelectItem>
                                                         <SelectItem value="F">Feminino</SelectItem>
+                                                        <SelectItem value="O">Outro</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 <div className="min-h-[20px]">

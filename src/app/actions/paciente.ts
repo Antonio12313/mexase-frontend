@@ -224,11 +224,23 @@ export async function salvarDadosDieteticos(pacienteId: string, dados: any, isEd
   }
 }
 
-export async function buscarTotalDePacientesPorSexo(id: string) {
+export async function buscarTotalDePacientesPorSexo() {
   const cookieStore = cookies()
   const token = (await cookieStore).get('@mexase/token')?.value
   return callApi(async () => {
     const response = await api.get(`/pacientes/por-genero`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return { success: true, data: response.data }
+  })
+}
+
+export async function buscarTotalDePacientesPorSetor() {
+  const cookieStore = cookies()
+  const token = (await cookieStore).get('@mexase/token')?.value
+
+  return callApi(async () => {
+    const response = await api.get(`/pacientes/por-setor`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     return { success: true, data: response.data }
