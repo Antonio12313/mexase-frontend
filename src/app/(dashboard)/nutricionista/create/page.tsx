@@ -70,11 +70,11 @@ export default function Page() {
     const onSubmit = async (data: NutricionistaFormValues) => {
     try {
         const payload = {
-        matricula: Number(data.matricula),
-        nome: data.nome,
-        email: data.email,
-        telefone: data.telefone || null,
-        senha: data.senha,
+            matricula: Number(data.matricula),
+            nome: data.nome,
+            email: data.email,
+            telefone: data.telefone || null,
+            senha: data.senha,
         };
 
         const result = await salvarNutricionista(payload);
@@ -145,7 +145,7 @@ export default function Page() {
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Matricula *</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="0000000000" {...field} />
+                                                    <Input placeholder="0000000000" maxLength={10} {...field} />
                                                 </FormControl>
                                                 <div className="min-h-[20px]">
                                                     <FormDescription>Apenas números, sem pontos ou

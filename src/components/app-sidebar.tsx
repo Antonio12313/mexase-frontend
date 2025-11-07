@@ -63,12 +63,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           cachedUser = userData
           setUser(userData)
 
-          if (!document.documentElement.classList.contains("dark") && userData.isDarkTema)
-          document.documentElement.classList.add("dark")
+          setTheme(userData.isDarkTema ? "dark" : "light")
+
+          if (userData.isDarkTema) {
+            document.documentElement.classList.add("dark")
+          } else {
+            document.documentElement.classList.remove("dark")
+          }
         }
       } catch (err) {
         console.error("Erro ao carregar usuário/tema:", err)
-      } finally {
+      } finally { 
         setLoading(false)
       }
     }

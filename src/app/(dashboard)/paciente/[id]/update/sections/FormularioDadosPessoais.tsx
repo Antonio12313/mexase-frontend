@@ -13,14 +13,25 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { Save, ArrowLeft } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { validarCPF } from "@/lib/utils"
 
 const schema = z.object({
   nome: z.string().min(3, "O nome é obrigatório"),
   email: z.string().email("E-mail inválido"),
-  cpf: z.string().min(11, "CPF inválido"),
+  cpf: z.string()
+        .length(11, { error: "O CPF deve ter 11 dígitos" })
+        .regex(/^\d+$/, { error: "O CPF deve conter apenas números" })
+        .refine((cpf) => validarCPF(cpf), { message: "CPF inválido" }),
   telefone: z.string().min(10, "Telefone inválido"),
   sexo: z.string(),
-  data_nascimento: z.string(),
+  data_nascimento: z.string()
+      .refine((val) => {
+      const data = new Date(val)
+      const hoje = new Date()
+      const minDate = new Date("1900-01-01")
+      const maxDate = new Date("2010-12-31")
+      return data <= hoje && data >= minDate && data <= maxDate
+      }, { message: "Data de nascimento inválida" }),
   cd_setor: z.string(),
   naturalidade: z.string().min(3, "Naturalidade é obrigatória"),
 })
@@ -109,7 +120,7 @@ export function FormularioDadosPessoais({ pacienteId }: { pacienteId: string }) 
             <FormField control={form.control} name="cpf" render={({ field }) => (
               <FormItem>
                 <FormLabel>CPF</FormLabel>
-                <FormControl><Input {...field} maxLength={11} /></FormControl>
+                <FormControl><Input {...field} placeholder="00000000000" maxLength={11} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />

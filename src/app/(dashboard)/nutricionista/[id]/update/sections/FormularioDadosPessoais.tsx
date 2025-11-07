@@ -104,7 +104,7 @@ export function FormularioDadosPessoais({ nutricionistaId }: { nutricionistaId: 
                 <FormItem className="flex flex-col">
                   <FormLabel>Matrícula *</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="0000000000" value={field.value as string} />
+                    <Input {...field} placeholder="0000000000" maxLength={10} value={field.value as string} />
                   </FormControl>
                   <div className="min-h-[1.25rem]">
                     <FormMessage>{fieldState.error?.message}</FormMessage>
