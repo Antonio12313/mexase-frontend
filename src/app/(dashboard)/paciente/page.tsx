@@ -90,7 +90,7 @@ export default function Page() {
                         </div>
                         <Button className="gap-3" asChild>
                             <Link href="/paciente/create">
-                                <Plus className="h-4 w-4" /> Novo
+                                <Plus className="h-4 w-4" /> Novo Paciente
                             </Link>
                         </Button>
                     </div>
