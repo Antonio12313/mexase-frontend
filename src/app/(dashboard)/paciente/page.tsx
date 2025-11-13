@@ -59,6 +59,13 @@ export default function Page() {
         router.push(`/paciente/${id}/update`)
     }
 
+    const iniciarConsulta = async (id: string) => {
+        router.push(`/paciente/${id}/consulta/create`)
+    }
+
+    const visualizarConsultas = async (id: string) => {
+        router.push(`/paciente/${id}/consulta`)
+    }
 
     useEffect(() => {
         fetchData()
@@ -162,10 +169,10 @@ export default function Page() {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                        <DropdownMenuItem className="gap-2">
+                                                        <DropdownMenuItem className="gap-2" onClick={() => iniciarConsulta(paciente.id)}>
                                                             <StethoscopeIcon className="h-4 w-4" /> Iniciar Consulta
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="gap-2"><Eye className="h-4 w-4" /> Visualizar Consulta</DropdownMenuItem>
+                                                        <DropdownMenuItem className="gap-2" onClick={() => visualizarConsultas(paciente.id)}><Eye className="h-4 w-4" /> Visualizar Consultas</DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="gap-2"
                                                             onClick={() => editarPaciente(paciente.id)}
