@@ -16,6 +16,7 @@ import { listarSetores } from "@/app/actions/setores"
 import { salvarPaciente } from "@/app/actions/paciente"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { validarCPF } from "@/lib/utils"
 
 const pacienteSchema = z.object({
     nome: z.string()
@@ -26,10 +27,16 @@ const pacienteSchema = z.object({
 
     cpf: z.string()
         .length(11, { error: "O CPF deve ter 11 dígitos" })
-        .regex(/^\d+$/, { error: "O CPF deve conter apenas números" }),
+        .regex(/^\d+$/, { error: "O CPF deve conter apenas números" })
+        .refine((cpf) => validarCPF(cpf), { message: "CPF inválido" }),
 
     data_nascimento: z.string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, { error: "A data inserida é inválida" }),
+        .refine((val) => {
+        const data = new Date(val)
+        const hoje = new Date()
+        const minDate = new Date("1900-01-01")
+        return data <= hoje && data >= minDate
+        }, { message: "Data de nascimento inválida" }),
 
     telefone: z.string()
         .min(8, { error: "O telefone deve ter no mínimo 8 dígitos" })
