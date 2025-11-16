@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation"
 import { login } from "@/app/actions/auth"
 import { useForm } from "react-hook-form"
 import { FormField } from "./form-field"
+import { FormControl } from "./ui/form"
+import { Eye, EyeOff } from "lucide-react"
 
 type LoginFormData = {
   email: string
@@ -19,6 +21,7 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const [error, setError] = useState("")
+  const [showSenha, setShowSenha] = useState(false);
   const router = useRouter()
   const form = useForm<LoginFormData>({
     defaultValues: { email: "", senha: "" },
@@ -61,7 +64,20 @@ export function LoginForm({
         </FormField>
 
         <FormField control={form.control} name="senha" label="Senha">
-          <Input type="password" required />
+           <div className="relative">
+                <Input id="password" type={showSenha ? "text" : "password"} placeholder="••••••••"/>
+                <button
+                    type="button"
+                    aria-label={showSenha ? "Esconder senha" : "Mostrar senha"}
+                    onClick={() => setShowSenha((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded outline-none focus:outline-none"                                                    >
+                    {showSenha ? (
+                    <EyeOff className="h-5 w-5" />
+                    ) : (
+                    <Eye className="h-5 w-5" />
+                    )}
+                </button>
+            </div>
         </FormField>
 
         <Button
