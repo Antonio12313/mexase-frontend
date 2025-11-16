@@ -27,6 +27,7 @@ import {
 import { logout } from "@/app/actions/auth"
 import { clearCachedUser } from "@/components/app-sidebar"
 import { ThemeToggle } from "./theme-toggle"
+import { useTheme } from "next-themes"
 
 
 function getInitials(name: string) {
@@ -59,10 +60,11 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const initials = getInitials(user.name)
   const bgColor = getColorFromName(user.name || "Usuário")
+  const { setTheme } = useTheme()
 
   async function handleLogout() {
     clearCachedUser()
-    document.documentElement.classList.remove("dark")
+    setTheme("light")
     localStorage.removeItem("theme")
     await logout()
   }

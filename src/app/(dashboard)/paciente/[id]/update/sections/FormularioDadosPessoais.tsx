@@ -19,19 +19,19 @@ const schema = z.object({
   nome: z.string().min(3, "O nome é obrigatório"),
   email: z.string().email("E-mail inválido"),
   cpf: z.string()
-        .length(11, { error: "O CPF deve ter 11 dígitos" })
-        .regex(/^\d+$/, { error: "O CPF deve conter apenas números" })
-        .refine((cpf) => validarCPF(cpf), { message: "CPF inválido" }),
+    .length(11, { message: "O CPF deve ter 11 dígitos" })
+    .regex(/^\d+$/, { message: "O CPF deve conter apenas números" })
+    .refine((cpf) => validarCPF(cpf), { message: "CPF inválido" }),
   telefone: z.string().min(10, "Telefone inválido"),
   sexo: z.string(),
   data_nascimento: z.string()
-      .refine((val) => {
+    .refine((val) => {
       const data = new Date(val)
       const hoje = new Date()
       const minDate = new Date("1900-01-01")
       const maxDate = new Date("2010-12-31")
       return data <= hoje && data >= minDate && data <= maxDate
-      }, { message: "Data de nascimento inválida" }),
+    }, { message: "Data de nascimento inválida" }),
   cd_setor: z.string(),
   naturalidade: z.string().min(3, "Naturalidade é obrigatória"),
 })
@@ -109,89 +109,123 @@ export function FormularioDadosPessoais({ pacienteId }: { pacienteId: string }) 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.control} name="nome" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
 
-            <FormField control={form.control} name="cpf" render={({ field }) => (
-              <FormItem>
-                <FormLabel>CPF</FormLabel>
-                <FormControl><Input {...field} placeholder="00000000000" maxLength={11} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="nome"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl><Input {...field} /></FormControl>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="data_nascimento" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Data de Nascimento</FormLabel>
-                <FormControl><Input type="date" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="cpf"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>CPF</FormLabel>
+                  <FormControl><Input {...field} placeholder="00000000000" maxLength={11} /></FormControl>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="sexo" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sexo</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="M">Masculino</SelectItem>
-                    <SelectItem value="F">Feminino</SelectItem>
-                    <SelectItem value="O">Outro</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="data_nascimento"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Data de Nascimento</FormLabel>
+                  <FormControl><Input type="date" {...field} /></FormControl>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="email" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl><Input type="email" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="sexo"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Sexo</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="M">Masculino</SelectItem>
+                      <SelectItem value="F">Feminino</SelectItem>
+                      <SelectItem value="O">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="telefone" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Telefone</FormLabel>
-                <FormControl><Input {...field} maxLength={11} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl><Input type="email" {...field} /></FormControl>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="naturalidade" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Naturalidade</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="telefone"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Telefone</FormLabel>
+                  <FormControl><Input {...field} maxLength={11} /></FormControl>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="cd_setor" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Setor</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {setores.map((s) => (
-                      <SelectItem key={s.cd_setor} value={String(s.cd_setor)}>
-                        {s.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="naturalidade"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Naturalidade</FormLabel>
+                  <FormControl><Input {...field} /></FormControl>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="cd_setor"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Setor</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {setores.map((s) => (
+                        <SelectItem key={s.cd_setor} value={String(s.cd_setor)}>
+                          {s.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="min-h-[1.25rem]"><FormMessage /></div>
+                </FormItem>
+              )}
+            />
+
           </div>
 
           <div className="flex justify-end gap-4 pt-4 border-t">
