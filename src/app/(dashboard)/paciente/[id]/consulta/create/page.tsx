@@ -1072,7 +1072,7 @@ export default function CadastroConsulta() {
                                     {(Object.keys(recordatorioSchema.shape) as Array<keyof typeof recordatorioSchema.shape>).map(key => (
                                         <div style={{ marginBottom: "12px" }}
                                             key={key}
-                                            className="border rounded-xl p-4 shadow-sm space-y-4 bg-white"
+                                            className="border rounded-xl p-4 shadow-sm space-y-4"
                                         >
                                             <h3 className="font-semibold text-base capitalize border-b pb-2">
                                                 {key}
@@ -1087,26 +1087,26 @@ export default function CadastroConsulta() {
                                                         <FormItem>
                                                             <FormLabel>Dia da Semana</FormLabel>
                                                             <FormControl>
-                                                                <select
-                                                                    className="border rounded p-2 w-full"
-                                                                    value={field.value}
-                                                                    onChange={field.onChange}
-                                                                >
-                                                                    <option value="">Selecione...</option>
-                                                                    {[
-                                                                        "Domingo",
-                                                                        "Segunda-feira",
-                                                                        "Terça-feira",
-                                                                        "Quarta-feira",
-                                                                        "Quinta-feira",
-                                                                        "Sexta-feira",
-                                                                        "Sábado",
-                                                                    ].map((dia) => (
-                                                                        <option key={dia} value={dia}>
-                                                                            {dia}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
+                                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                                    <SelectTrigger className="w-full">
+                                                                        <SelectValue placeholder="Selecione..." />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {[
+                                                                            "Domingo",
+                                                                            "Segunda-feira",
+                                                                            "Terça-feira",
+                                                                            "Quarta-feira",
+                                                                            "Quinta-feira",
+                                                                            "Sexta-feira",
+                                                                            "Sábado",
+                                                                        ].map((dia) => (
+                                                                            <SelectItem key={dia} value={dia}>
+                                                                                {dia}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
                                                             </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
@@ -1136,17 +1136,18 @@ export default function CadastroConsulta() {
                                                         <FormItem>
                                                             <FormLabel>Frequência</FormLabel>
                                                             <FormControl>
-                                                                <select
-                                                                    className="border rounded p-2 w-full"
-                                                                    value={field.value}
-                                                                    onChange={field.onChange}
-                                                                >
-                                                                    {["Diário", "Semanal", "Quinzenal", "Mensal"].map((freq) => (
-                                                                        <option key={freq} value={freq}>
-                                                                            {freq}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
+                                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                                    <SelectTrigger className="w-full">
+                                                                        <SelectValue placeholder="Selecione..." />
+                                                                    </SelectTrigger>
+
+                                                                    <SelectContent>
+                                                                        <SelectItem value="Diário">Diário</SelectItem>
+                                                                        <SelectItem value="Semanal">Semanal</SelectItem>
+                                                                        <SelectItem value="Quinzenal">Quinzenal</SelectItem>
+                                                                        <SelectItem value="Mensal">Mensal</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
                                                             </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
@@ -1360,7 +1361,7 @@ export default function CadastroConsulta() {
                                     {form.watch("dados_bioquimicos").map((_, index) => (
                                         <div
                                             key={index}
-                                            className="border rounded-xl p-4 shadow-sm bg-white space-y-3"
+                                            className="border rounded-xl p-4 shadow-sm space-y-3"
                                         >
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <FormField
@@ -1405,19 +1406,21 @@ export default function CadastroConsulta() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Unidade de Medida</FormLabel>
-                                                            <FormControl>
-                                                                <select
-                                                                    className="border rounded p-2 w-full"
-                                                                    value={field.value}
-                                                                    onChange={field.onChange}
-                                                                >
-                                                                    {Object.values(UnidadeMedidaEnum.enum).map((u) => (
-                                                                        <option key={u} value={u}>
-                                                                            {u}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
-                                                            </FormControl>
+                                                                <FormControl>
+                                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                                        <SelectTrigger className="w-full">
+                                                                            <SelectValue placeholder="Selecione..." />
+                                                                        </SelectTrigger>
+
+                                                                        <SelectContent>
+                                                                            {Object.values(UnidadeMedidaEnum.enum).map((u) => (
+                                                                            <SelectItem key={u} value={u}>
+                                                                                {u}
+                                                                            </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}

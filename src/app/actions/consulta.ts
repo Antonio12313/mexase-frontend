@@ -2,6 +2,7 @@
 import api from "@/services/api"
 import { callApi } from "@/services/apiClient"
 import { cookies } from "next/headers"
+import { Buffer } from 'buffer';
 
 export async function salvarConsulta(dados: any, id_paciente: string, consultaId: string) {
   console.log("chegou aqui3")
@@ -38,3 +39,13 @@ export async function buscarConsultaPorId(id_consulta: string) {
   })
 }
 
+export async function obterTokenParaPDF(): Promise<{ success: boolean, token: string | null, error?: string }> {
+    const cookieStore = cookies();
+    const token = (await cookieStore).get('@mexase/token')?.value;
+
+    if (!token) {
+        return { success: false, token: null, error: "Token de autenticação não encontrado." };
+    }
+    
+    return { success: true, token: token }; 
+}
