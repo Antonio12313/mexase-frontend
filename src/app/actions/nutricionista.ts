@@ -141,3 +141,43 @@ export async function alterarTemaDoNutricionista() {
     )
   })
 }
+
+export async function buscarTotalConsultasDoMes() {
+  const cookieStore = cookies()
+  const token = (await cookieStore).get("@mexase/token")?.value
+
+  if (!token) {
+    throw new Error("Token não encontrado")
+  }
+
+  const decoded = jwtDecode<TokenPayload>(token)
+  const usuarioId = decoded.id
+
+  return callApi(async () => {
+    const response = await api.get(`/nutricionista/${usuarioId}/total-consultas-mes`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    return { success: true, data: response.data }
+  })
+}
+
+export async function buscarTotalConsultasDosUltimos12Meses() {
+  const cookieStore = cookies()
+  const token = (await cookieStore).get("@mexase/token")?.value
+
+  if (!token) {
+    throw new Error("Token não encontrado")
+  }
+
+  const decoded = jwtDecode<TokenPayload>(token)
+  const usuarioId = decoded.id
+
+  return callApi(async () => {
+    const response = await api.get(`/nutricionista/${usuarioId}/consultas-ultimos-12-meses`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    return { success: true, data: response.data }
+  })
+}

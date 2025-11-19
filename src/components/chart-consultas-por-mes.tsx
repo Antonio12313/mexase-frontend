@@ -1,4 +1,6 @@
-import { TrendingUp } from "lucide-react"
+"use client"
+
+import { useEffect, useState } from "react"
 import { Area, AreaChart, CartesianGrid, XAxis, ResponsiveContainer } from "recharts"
 import {
   Card,
@@ -8,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 import {
   ChartConfig,
   ChartContainer,
@@ -15,20 +18,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { month: "Jan", consultas: 45 },
-  { month: "Fev", consultas: 60 },
-  { month: "Mar", consultas: 40 },
-  { month: "Abr", consultas: 75 },
-  { month: "Mai", consultas: 80 },
-  { month: "Jun", consultas: 70 },
-  { month: "Jul", consultas: 5 },
-  { month: "Ago", consultas: 90 },
-  { month: "Set", consultas: 78 },
-  { month: "Out", consultas: 88 },
-  { month: "Nov", consultas: 95 },
-  { month: "Dez", consultas: 29 },
-]
+import { buscarTotalConsultasDosUltimos12Meses } from "@/app/actions/nutricionista"
+
+const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
 
 const chartConfig = {
   consultas: {
@@ -38,46 +30,75 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ChartConsultasPorMes() {
+  const [chartData, setChartData] = useState<any[]>([])
+
+  useEffect(() => {
+    async function carregar() {
+      const resposta = await buscarTotalConsultasDosUltimos12Meses()
+      const dados = resposta.data
+
+      if (!Array.isArray(dados)) return
+
+      const convertidos = dados.map((item) => ({
+        month: meses[item.mes - 1], 
+        consultas: item.total,
+        ano: item.ano,
+        mesNumero: item.mes,
+      }))
+
+      convertidos.sort((a, b) => {
+        if (a.ano !== b.ano) return a.ano - b.ano
+        return a.mesNumero - b.mesNumero
+      })
+
+      setChartData(convertidos)
+    }
+
+    carregar()
+  }, [])
+
   return (
-    <Card className="w-full h-100">
+    <Card className="h-100">
       <CardHeader>
         <CardTitle>Consultas por Mês</CardTitle>
-        <CardDescription>Número total de consultas ao longo do ano</CardDescription>
+        <CardDescription>Últimos 12 meses</CardDescription>
       </CardHeader>
-      <CardContent className="w-full max-w-full overflow-hidden">
+
+      <CardContent className="overflow-hidden">
         <ChartContainer config={chartConfig} className="h-full w-full max-w-full overflow-hidden">
-            <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-                data={chartData}
-                margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+              data={chartData}
+              margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
             >
-                <CartesianGrid vertical={false} />
-                <XAxis
+              <CartesianGrid vertical={false} />
+              <XAxis
                 dataKey="month"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                />
-                <ChartTooltip
+              />
+              <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="line" />}
-                />
-                <Area
+              />
+              <Area
                 dataKey="consultas"
-                type="natural"
+                type="monotone"
                 fill="var(--color-consultas)"
                 fillOpacity={0.4}
                 stroke="var(--color-consultas)"
-                />
+              />
             </AreaChart>
-            </ResponsiveContainer>
+          </ResponsiveContainer>
         </ChartContainer>
-        </CardContent>
+      </CardContent>
+
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              Janeiro - Dezembro {new Date().getFullYear()}
+              Últimos 12 meses até {meses[new Date().getMonth()]} {new Date().getFullYear()}
             </div>
           </div>
         </div>

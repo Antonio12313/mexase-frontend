@@ -16,7 +16,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
-import { Eye, MoreVertical, Pencil, Plus, Search, StethoscopeIcon, Trash2 } from "lucide-react"
+import { Activity, Eye, MoreVertical, Pencil, Plus, Search, StethoscopeIcon, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { SetBreadcrumbs } from "@/lib/breadcrumbs-context"
 import { toast } from "sonner"
@@ -65,6 +65,10 @@ export default function Page() {
 
     const visualizarConsultas = async (id: string) => {
         router.push(`/paciente/${id}/consulta`)
+    }
+
+    const evolucaoPaciente = async (id: string) => {
+        router.push(`/paciente/${id}/dashboard`)
     }
 
     useEffect(() => {
@@ -173,6 +177,7 @@ export default function Page() {
                                                             <StethoscopeIcon className="h-4 w-4" /> Iniciar Consulta
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem className="gap-2" onClick={() => visualizarConsultas(paciente.id)}><Eye className="h-4 w-4" /> Visualizar Consultas</DropdownMenuItem>
+                                                        <DropdownMenuItem className="gap-2" onClick={() => evolucaoPaciente(paciente.id)}><Activity className="h-4 w-4" /> Evolução do Paciente </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="gap-2"
                                                             onClick={() => editarPaciente(paciente.id)}

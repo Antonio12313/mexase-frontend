@@ -246,3 +246,16 @@ export async function buscarTotalDePacientesPorSetor() {
     return { success: true, data: response.data }
   })
 }
+
+export async function buscarEvolucaoAntropometrica(idPaciente: string) {
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("@mexase/token")?.value;
+
+  return callApi(async () => {
+    const response = await api.get(`/paciente/${idPaciente}/evolucao-antropometrica`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return { success: true, data: response.data };
+  });
+}
